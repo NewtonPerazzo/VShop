@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+using System.Text.Json.Serialization;
 using VShop.ProductApi.Context;
 using VShop.ProductApi.Repository;
 using VShop.ProductApi.Services;
@@ -8,7 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(x => 
+    x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 // Configure Swagger (Swashbuckle)
 builder.Services.AddSwaggerGen();
 builder.Services.AddEndpointsApiExplorer();
