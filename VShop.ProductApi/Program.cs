@@ -1,13 +1,30 @@
 using Microsoft.EntityFrameworkCore;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using VShop.ProductApi.Context;
+using VShop.ProductApi.Repository;
+using VShop.ProductApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// Configure Swagger (Swashbuckle)
+builder.Services.AddSwaggerGen();
+builder.Services.AddEndpointsApiExplorer();
+
+// Configure CORS
+var allowedOrigins = "_allowedOrigins";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(allowedOrigins, policy =>
+    {
+        // Development-friendly: allow any origin/header/method. Restrict in production.
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
 // connection string for MySQL database using the connection string from appsettings.json
 var mySqlConnection = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -16,15 +33,29 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+// the services and repositories dependency injection
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.DocumentTitle = "VShop API";
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "VShop API");
+
+    });
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors(allowedOrigins);
 
 app.UseAuthorization();
 
