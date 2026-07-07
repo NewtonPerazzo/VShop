@@ -23,8 +23,10 @@ namespace VShop.ProductApi.Repository
         public async Task<Product> Delete(int id)
         {
             var product = await GetById(id);
+            if (product == null)
+                return null;
             _context.Products.Remove(product);
-            _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
             return product;
         }
 

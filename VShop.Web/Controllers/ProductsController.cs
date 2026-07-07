@@ -49,4 +49,47 @@ public class ProductsController : Controller
         ViewBag.CategoryId = new SelectList(await _categoryService.GetAllCategories(), "CategoryId", "Name");
         return View(product);
     }
+
+    [HttpGet]
+    public async Task<ActionResult> UpdateProduct(int id)
+    {
+        ViewBag.CategoryId = new SelectList(await _categoryService.GetAllCategories(), "CategoryId", "Name");
+        var result = await _productService.GetProductById(id);
+        if (result is null)
+            return View("Error");
+        return View(result);
+    }
+
+    [HttpPost]
+    public async Task<ActionResult> UpdateProduct(ProductViewModel product)
+    {
+        if (ModelState.IsValid)
+        {
+            var result = await _productService.UpdateProduct(product);
+            if (result != null)
+                return RedirectToAction(nameof(Index));
+        }
+
+        ViewBag.CategoryId = new SelectList(await _categoryService.GetAllCategories(), "CategoryId", "Name");
+        return View(product);
+    }
+
+    [HttpGet]
+    public async Task<ActionResult> DeleteProduct(int id)
+    {
+        var result = await _productService.GetProductById(id);
+        if (result is null)
+            return View("Error");
+        return View(result);
+    }
+
+    [HttpPost(), ActionName("DeleteProduct")] //actionname does not match the method name, so we need to specify it here and use the same name in the view form action instead of deleteconfirmed
+    public async Task<ActionResult> DeleteConfirmed(int id)
+    {
+        var result = await _productService.DeleteProduct(id);
+        if (result == null)
+            return View("Error");
+
+         return RedirectToAction("Index");
+    }
 }

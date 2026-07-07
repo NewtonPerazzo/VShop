@@ -45,14 +45,11 @@ public class ProductsController : ControllerBase
         return CreatedAtRoute("GetProduct", new { id = productDTO.Id }, productDTO);
     }
 
-    [HttpPut("{id:int}")]
-    public async Task<ActionResult<ProductDTO>> Put(int id, [FromBody] ProductDTO productDTO)
+    [HttpPut]
+    public async Task<ActionResult<ProductDTO>> Put([FromBody] ProductDTO productDTO)
     {
-        if (id != productDTO.Id)
-            return BadRequest("Invalid data");
-
         if (productDTO == null)
-            return BadRequest();
+            return BadRequest("Invalid data");
         await _productService.UpdateProduct(productDTO);
         return Ok(productDTO);
     }
