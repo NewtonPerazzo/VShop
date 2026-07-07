@@ -41,8 +41,8 @@ public class ProductsController : ControllerBase
             return BadRequest("Invalid data");
         await _productService.AddProduct(productDTO);
 
-        // return product getting by id
-        return new CreatedAtActionResult("GetProduct", "Product", new { id = productDTO.Id }, productDTO);
+        // return product getting by id using the named route to avoid controller/action name mismatches
+        return CreatedAtRoute("GetProduct", new { id = productDTO.Id }, productDTO);
     }
 
     [HttpPut("{id:int}")]
